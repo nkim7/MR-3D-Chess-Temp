@@ -1,5 +1,8 @@
 # MR-3D-Chess
 
+## External models:
+Chess set: https://free3d.com/3d-model/chess-table-18114.html
+
 ### Using Git LFS:
 
  - To add file types to track: e.g. `git lfs track "*.so"` to track files of type .so
