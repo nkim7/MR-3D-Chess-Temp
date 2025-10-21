@@ -1,4 +1,5 @@
 using Oculus.Interaction;
+using Oculus.Interaction.HandGrab;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +12,8 @@ public class ChessBoard : MonoBehaviour
     OVRSpatialAnchor anchorA;
     OVRSpatialAnchor anchorB;
 
-    Grabbable grabbableA;
-    Grabbable grabbableB;
+    HandGrabInteractable grabbableA;
+    HandGrabInteractable grabbableB;
     bool was_grabbed = false;
 
     float original_distance;
@@ -24,8 +25,8 @@ public class ChessBoard : MonoBehaviour
         anchorA = handleA.GetComponent<OVRSpatialAnchor>();
         anchorB = handleB.GetComponent<OVRSpatialAnchor>();
 
-        grabbableA = handleA.GetComponent<Grabbable>();
-        grabbableB = handleB.GetComponent<Grabbable>();
+        grabbableA = handleA.GetComponent<HandGrabInteractable>();
+        grabbableB = handleB.GetComponent<HandGrabInteractable>();
 
         original_scale = transform.localScale;
         original_distance = (handleA.transform.position - handleB.transform.position).magnitude;
@@ -36,11 +37,9 @@ public class ChessBoard : MonoBehaviour
     {
         if (handleA != null && handleB != null)
         {
-            PlaceChessBoard();
 
-            Debug.Log(grabbableA.GrabPoints);
-            if (false) { 
-                
+            if (grabbableA.State == InteractableState.Select || grabbableB.State == InteractableState.Select) {
+                PlaceChessBoard();
 
                 was_grabbed = true;
                 //anchorA.enabled = false;
@@ -48,6 +47,7 @@ public class ChessBoard : MonoBehaviour
             }
             else if (was_grabbed)
             {
+                Debug.Log("Release");
                 was_grabbed = false;
                 //anchorA.enabled = true;
                 //anchorB.enabled = true;
