@@ -1,6 +1,6 @@
 # Blender 3.6.9
 # www.blender.org
-mtllib Pawn.mtl
+mtllib Pawn.mtl.mtl
 o White_Pawn.007
 v -0.005495 0.045976 0.000000
 v -0.007771 0.040481 0.000000
