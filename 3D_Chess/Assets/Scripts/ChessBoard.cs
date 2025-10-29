@@ -3,12 +3,12 @@ using Oculus.Interaction.HandGrab;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityChess;
 
 public class ChessBoard : MonoBehaviour
 {
     public GameObject handleA;
     public GameObject handleB;
-
     OVRSpatialAnchor anchorA;
     OVRSpatialAnchor anchorB;
 
@@ -31,7 +31,7 @@ public class ChessBoard : MonoBehaviour
         original_scale = transform.localScale;
         original_distance = (handleA.transform.position - handleB.transform.position).magnitude;
     }
-
+    
     // Update is called once per frame
     void Update()
     {

@@ -3,6 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using Oculus.Interaction;
 using Oculus.Interaction.HandGrab;
+using UnityChess;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SnapToBoardOnRelease : MonoBehaviour
@@ -26,13 +27,20 @@ public class SnapToBoardOnRelease : MonoBehaviour
     private float boardHeight;
     private float cellSize;
 
+    // Connecting to Backend:
+    private ChessPiece chessPiece;
+
+    private Square currSquare;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         grabbable = GetComponent<Grabbable>();
         handGrabInteractable = GetComponent<HandGrabInteractable>();
 
-
+        int file = chessPiece.startFile - 1;
+        int rank = chessPiece.startRank - 1;
+        currSquare = new Square(file, rank);
         if (board == null)
         {
             Debug.LogError("set board in Inspector");
@@ -66,8 +74,10 @@ public class SnapToBoardOnRelease : MonoBehaviour
     }
 
     void Update()
-    {
-        if (board == null) return;
+    {   
+        int file = chessPiece.logicalSquare.File - 1;
+        int rank = chessPiece.logicalSquare.Rank - 1;
+        currSquare = new Square(file, rank);
 
         bool grabbedNow = IsGrabbedOculus();
         if (wasGrabbed && !grabbedNow)
@@ -124,8 +134,38 @@ public class SnapToBoardOnRelease : MonoBehaviour
         float originZ = -boardHeight * 0.5f;
 
         // 加上 0.5f，让格子对齐中心而非交点
+        // c = file, r = rank
         int c = Mathf.Clamp(Mathf.FloorToInt((local.x - originX) / cellSize), 0, cols - 1);
         int r = Mathf.Clamp(Mathf.FloorToInt((local.z - originZ) / cellSize), 0, rows - 1);
+
+        // c += 1;
+        // r += 1;
+        if (chessPiece != null)
+        {
+            if (chessPiece.logicalSquare == new Square(c + 1, r + 1))
+            {
+                // Same square as before
+                c = currSquare.File;
+                r = currSquare.Rank;
+                Debug.Log($"Piece already on square. file: {c+1}, rank: {r+1}");
+
+            }
+            else
+            {
+                Debug.Log($"Piece to move to square with file: {c}, rank: {r}");
+                bool tryLogicalMove = chessPiece.SetSquare(new Square(c + 1, r + 1));
+                if (!tryLogicalMove)
+                {
+                    // Invalid move, do not snap
+                    Debug.Log($"Invalid move, not snapping piece. file: {c+1}, rank: {r+1}");
+                    c = currSquare.File;
+                    r = currSquare.Rank;
+                }
+            }
+        }
+
+        // c -= 1;
+        // r -= 1;
 
         float cx = originX + (c + 0.5f) * cellSize;
         float cz = originZ + (r + 0.5f) * cellSize;
@@ -145,6 +185,8 @@ public class SnapToBoardOnRelease : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine(SmoothMove(worldTarget));
         }
+        currSquare = new Square(c + 1, r + 1);
+        
     }
 
     IEnumerator SmoothMove(Vector3 target)
