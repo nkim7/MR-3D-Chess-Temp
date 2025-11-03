@@ -37,9 +37,9 @@ public class SnapToBoardOnRelease : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         grabbable = GetComponent<Grabbable>();
         handGrabInteractable = GetComponent<HandGrabInteractable>();
-
-        int file = chessPiece.startFile - 1;
-        int rank = chessPiece.startRank - 1;
+        chessPiece = GetComponent<ChessPiece>();
+        int file = chessPiece.startFile;
+        int rank = chessPiece.startRank;
         currSquare = new Square(file, rank);
         if (board == null)
         {
@@ -74,9 +74,9 @@ public class SnapToBoardOnRelease : MonoBehaviour
     }
 
     void Update()
-    {   
-        int file = chessPiece.logicalSquare.File - 1;
-        int rank = chessPiece.logicalSquare.Rank - 1;
+    {
+        int file = chessPiece.logicalSquare.File;
+        int rank = chessPiece.logicalSquare.Rank;
         currSquare = new Square(file, rank);
 
         bool grabbedNow = IsGrabbedOculus();
@@ -142,30 +142,31 @@ public class SnapToBoardOnRelease : MonoBehaviour
         // r += 1;
         if (chessPiece != null)
         {
-            if (chessPiece.logicalSquare == new Square(c + 1, r + 1))
+            if (currSquare == new Square(c + 1, r + 1))
             {
                 // Same square as before
-                c = currSquare.File;
-                r = currSquare.Rank;
-                Debug.Log($"Piece already on square. file: {c+1}, rank: {r+1}");
+                c = currSquare.File - 1;
+                r = currSquare.Rank - 1;
+                Debug.Log($"Piece already on square. file: {c + 1}, rank: {r + 1}");
 
             }
             else
             {
-                Debug.Log($"Piece to move to square with file: {c}, rank: {r}");
+                Debug.Log($"Piece to move to square with file: {c + 1}, rank: {r + 1}");
                 bool tryLogicalMove = chessPiece.SetSquare(new Square(c + 1, r + 1));
                 if (!tryLogicalMove)
                 {
                     // Invalid move, do not snap
-                    Debug.Log($"Invalid move, not snapping piece. file: {c+1}, rank: {r+1}");
-                    c = currSquare.File;
-                    r = currSquare.Rank;
+                    Debug.Log($"Invalid move, not snapping piece. file: {c + 1}, rank: {r + 1}");
+                    c = currSquare.File - 1;
+                    r = currSquare.Rank - 1;
                 }
             }
         }
-
-        // c -= 1;
-        // r -= 1;
+        else
+        {
+            Debug.Log("chessPiece is null");
+        }
 
         float cx = originX + (c + 0.5f) * cellSize;
         float cz = originZ + (r + 0.5f) * cellSize;

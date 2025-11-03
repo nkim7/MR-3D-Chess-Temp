@@ -10,17 +10,12 @@ public class ChessPiece : MonoBehaviour
 
     public Piece logicalPiece { get; private set; }
 
-    public int startFile = 2;
-    public int startRank = 8;
+    public int startFile;
+    public int startRank;
 
-    public ChessPiece()
+    public void Awake()
     {
         logicalSquare = new Square(startFile, startRank); // Default starting position
-    }
-
-    public void SetLogicalPiece(Piece piece)
-    {
-        logicalPiece = piece;
     }
 
     public bool SetSquare(Square square)
@@ -51,11 +46,7 @@ public class ChessPiece : MonoBehaviour
             //     return;
             // }
         }
-        return false;               
-        // public void ShowAvailableMoves()
-        // {
-        //     // TODO: implement, and call in SnapToBoardOnRelease
-        // }
+        return false;      
 
     }
 }

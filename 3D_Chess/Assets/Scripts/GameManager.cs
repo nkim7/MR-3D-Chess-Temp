@@ -8,22 +8,23 @@ using UnityChess;
 public class GameManager : MonoBehaviour
 {
     // Chess Pieces
-    // public GameObject whitePawnPrefab;
-    // public GameObject whiteRookPrefab;
-    // public GameObject whiteKnightPrefab;
-    // public GameObject whiteBishopPrefab;
-    // public GameObject whiteQueenPrefab;
-    // public GameObject whiteKingPrefab;
-    // public GameObject blackPawnPrefab;
-    // public GameObject blackRookPrefab;
-    // public GameObject blackKnightPrefab;
-    // public GameObject blackBishopPrefab;
-    // public GameObject blackQueenPrefab;
-    // public GameObject blackKingPrefab;
+    public GameObject whitePawnPrefab;
+    public GameObject whiteRookPrefab;
+    public GameObject whiteKnightPrefab;
+    public GameObject whiteBishopPrefab;
+    public GameObject whiteQueenPrefab;
+    public GameObject whiteKingPrefab;
+    public GameObject blackPawnPrefab;
+    public GameObject blackRookPrefab;
+    public GameObject blackKnightPrefab;
+    public GameObject blackBishopPrefab;
+    public GameObject blackQueenPrefab;
+    public GameObject blackKingPrefab;
 
     public Game chessGame;
-    // private Dictionary<Square, ChessPiece> piecesBySquare = new Dictionary<Square, ChessPiece>();
-    // private Dictionary<Piece, ChessPiece> physicalPieces = new Dictionary<Piece, ChessPiece>();
+    // private Dictionary<Square, ChessPiece> squareToPiece = new Dictionary<Square, ChessPiece>();
+    // private Dictionary<ChessPiece, Square> pieceToSquare = new Dictionary<ChessPiece, Square>();
+    // // private Dictionary<Piece, ChessPiece> physicalPieces = new Dictionary<Piece, ChessPiece>();
     // public Transform chessBoard;
     void Start()
     {
