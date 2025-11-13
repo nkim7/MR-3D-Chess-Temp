@@ -4,20 +4,11 @@ using UnityEngine;
 
 public class PlaceBoard : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public bool clicked;
+    public ChessBoard chessboard;
 
     public void onClicked()
     {
-        Debug.LogError("Clicked");
-
-    }
-
-    public void Update()
-    {
-        if (clicked)
-        {
-            Debug.LogError("Enabled");
-        }
+        gameObject.SetActive(false);
+        chessboard.finish_placement();
     }
 }

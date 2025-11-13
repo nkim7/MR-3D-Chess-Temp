@@ -25,14 +25,20 @@ public class ChessBoard : MonoBehaviour
     float original_distance;
     Vector3 original_scale;
 
-    List<NativeArray<Vector3>> vertices;
-    List<NativeArray<int>> indices;
-    bool scene_layout_loaded = false;
+    bool update_chessboard_pos = true;
 
     void set_handle_active(bool active)
     {
         handleA.SetActive(active);
         handleB.SetActive(active);
+    }
+
+    void set_pieces_grabbable(bool grab_enabled)
+    {
+        foreach (HandGrabInteractable grab in gameObject.GetComponentsInChildren<HandGrabInteractable>())
+        {
+            grab.enabled = grab_enabled;
+        }
     }
 
     // Start is called before the first frame update
@@ -41,33 +47,22 @@ public class ChessBoard : MonoBehaviour
         anchorA = handleA.GetComponent<OVRSpatialAnchor>();
         anchorB = handleB.GetComponent<OVRSpatialAnchor>();
 
-        //set_handle_active(false);
-
         grabbableA = handleA.GetComponent<HandGrabInteractable>();
         grabbableB = handleB.GetComponent<HandGrabInteractable>();
-
-
 
         original_scale = transform.localScale;
         original_distance = (handleA.transform.position - handleB.transform.position).magnitude;
 
-        vertices = new List<NativeArray<Vector3>>();
-        indices = new List<NativeArray<int>>();
-
-        //get_layout();
         set_handle_active(true);
-        scene_layout_loaded = true; // TODO REMOVE
+        set_pieces_grabbable(false);
+        PlaceChessBoard();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!scene_layout_loaded)
-        {
-            return;
-        }
-
-        if (handleA != null && handleB != null)
+        if (handleA != null && handleB != null && update_chessboard_pos)
         {
             if (grabbableA.State == InteractableState.Select || grabbableB.State == InteractableState.Select)
             {
@@ -162,5 +157,13 @@ public class ChessBoard : MonoBehaviour
         transform.SetPositionAndRotation(center, rotation);
 
         transform.localScale = original_scale / original_distance * (handleA.transform.position - handleB.transform.position).magnitude;
+    }
+
+    public void finish_placement()
+    {
+        anchorA.gameObject.SetActive(false);
+        anchorB.gameObject.SetActive(false);
+        update_chessboard_pos = false;
+        set_pieces_grabbable(true);
     }
 }
