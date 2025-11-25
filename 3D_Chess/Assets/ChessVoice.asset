@@ -22,11 +22,134 @@ MonoBehaviour:
     isPrivate: 1
     createdAt: 2025-11-10T15:45:16-0800
     trainingStatus: 1
-    lastTrainDuration: 0
-    lastTrainedAt: 1969-12-31T16:00:00-0800
-    nextTrainAt: 1969-12-31T16:00:00-0800
-    intents: []
-    entities: []
+    lastTrainDuration: 419
+    lastTrainedAt: 2025-11-25T06:11:40-0800
+    nextTrainAt: 2025-11-25T06:04:41-0800
+    intents:
+    - id: 1523991728752485
+      name: move_piece
+      entities:
+      - name: chess_piece:chess_piece
+        id: 2293669854483290
+      - name: chess_square:chess_square
+        id: 1261878569033962
+    entities:
+    - name: chess_piece
+      id: 1551961405947982
+      lookups:
+      - keywords
+      roles:
+      - name: chess_piece
+        id: 2293669854483290
+      keywords:
+      - keyword: bishop
+        synonyms:
+        - bishop
+        - bishop's
+        - bishops
+      - keyword: horse
+        synonyms:
+        - horse
+      - keyword: knight
+        synonyms:
+        - knight
+        - knight's
+        - night
+        - nights
+        - nite
+      - keyword: pawn
+        synonyms:
+        - pawn
+        - pawns
+        - pond
+        - pone
+        - porn
+      - keyword: rook
+        synonyms:
+        - castle
+        - castles
+        - look
+        - rock
+        - rook
+        - rooks
+    - name: chess_square
+      id: 1275017331325940
+      lookups:
+      - keywords
+      roles:
+      - name: chess_square
+        id: 1261878569033962
+      keywords:
+      - keyword: a1
+        synonyms:
+        - a1
+      - keyword: a8
+        synonyms:
+        - a8
+      - keyword: b1
+        synonyms:
+        - b1
+      - keyword: b8
+        synonyms:
+        - b8
+      - keyword: c1
+        synonyms:
+        - c1
+      - keyword: c3
+        synonyms:
+        - c3
+        - see 3
+        - see three
+      - keyword: c6
+        synonyms:
+        - c6
+      - keyword: c8
+        synonyms:
+        - c8
+      - keyword: d4
+        synonyms:
+        - d4
+      - keyword: d5
+        synonyms:
+        - d5
+      - keyword: e4
+        synonyms:
+        - e for
+        - e4
+        - eat four
+        - he four
+      - keyword: e5
+        synonyms:
+        - e5
+      - keyword: f1
+        synonyms:
+        - f1
+      - keyword: f3
+        synonyms:
+        - f three
+        - f3
+      - keyword: f6
+        synonyms:
+        - f6
+      - keyword: f8
+        synonyms:
+        - f8
+      - keyword: g1
+        synonyms:
+        - g1
+      - keyword: g5
+        synonyms:
+        - g5
+        - need 5
+      - keyword: g8
+        synonyms:
+        - g8
+      - keyword: h1
+        synonyms:
+        - h1
+      - keyword: h8
+        synonyms:
+        - h8
     traits: []
     versionTags: []
     voices:
