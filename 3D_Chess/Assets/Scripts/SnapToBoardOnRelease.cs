@@ -27,9 +27,7 @@ public class SnapToBoardOnRelease : MonoBehaviour
     private float boardHeight;
     private float cellSize;
 
-    // Connecting to Backend:
     private ChessPiece chessPiece;
-
     private Square currSquare;
 
     void Awake()
@@ -38,12 +36,17 @@ public class SnapToBoardOnRelease : MonoBehaviour
         grabbable = GetComponent<Grabbable>();
         handGrabInteractable = GetComponent<HandGrabInteractable>();
         chessPiece = GetComponent<ChessPiece>();
-        int file = chessPiece.startFile;
-        int rank = chessPiece.startRank;
-        currSquare = new Square(file, rank);
+
+        if (chessPiece != null)
+        {
+            int file = chessPiece.startFile;
+            int rank = chessPiece.startRank;
+            currSquare = new Square(file, rank);
+        }
+
         if (board == null)
         {
-            Debug.LogError("set board in Inspector");
+            Debug.LogError("Board reference is not set on SnapToBoardOnRelease.");
         }
         else
         {
@@ -62,9 +65,7 @@ public class SnapToBoardOnRelease : MonoBehaviour
         else if (col != null)
             bounds = col.bounds;
         else
-        {
             bounds = new Bounds(Vector3.zero, new Vector3(1, 0, 1));
-        }
 
         Vector3 localSize = board.InverseTransformVector(bounds.size);
         boardWidth = Mathf.Abs(localSize.x);
@@ -75,9 +76,12 @@ public class SnapToBoardOnRelease : MonoBehaviour
 
     void Update()
     {
-        int file = chessPiece.logicalSquare.File;
-        int rank = chessPiece.logicalSquare.Rank;
-        currSquare = new Square(file, rank);
+        if (chessPiece != null)
+        {
+            int file = chessPiece.logicalSquare.File;
+            int rank = chessPiece.logicalSquare.Rank;
+            currSquare = new Square(file, rank);
+        }
 
         bool grabbedNow = IsGrabbedOculus();
         if (wasGrabbed && !grabbedNow)
@@ -102,6 +106,7 @@ public class SnapToBoardOnRelease : MonoBehaviour
 
         if (handGrabInteractable != null && TryGetInt(handGrabInteractable, "SelectingInteractorsCount", out int nHG2))
             return nHG2 > 0;
+
         if (grabbable != null && TryGetInt(grabbable, "SelectingInteractorsCount", out int nG2))
             return nG2 > 0;
 
@@ -112,43 +117,51 @@ public class SnapToBoardOnRelease : MonoBehaviour
     {
         value = 0;
         if (obj == null) return false;
+
         var t = obj.GetType();
         var p = t.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        if (p != null && p.PropertyType == typeof(int)) { value = (int)p.GetValue(obj); return true; }
+        if (p != null && p.PropertyType == typeof(int))
+        {
+            value = (int)p.GetValue(obj);
+            return true;
+        }
+
         var f = t.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-        if (f != null && f.FieldType == typeof(int)) { value = (int)f.GetValue(obj); return true; }
+        if (f != null && f.FieldType == typeof(int))
+        {
+            value = (int)f.GetValue(obj);
+            return true;
+        }
+
         return false;
     }
 
     void SnapToNearestCell()
     {
+        if (board == null) return;
+
         Vector3 up = board.up;
         Plane plane = new Plane(up, board.position);
 
-        if (!plane.Raycast(new Ray(transform.position + up * 5f, -up), out float enter)) return;
-        Vector3 projected = (new Ray(transform.position + up * 5f, -up)).GetPoint(enter);
+        Ray ray = new Ray(transform.position + up * 5f, -up);
+        if (!plane.Raycast(ray, out float enter)) return;
+        Vector3 projected = ray.GetPoint(enter);
 
         Vector3 local = board.InverseTransformPoint(projected);
 
         float originX = -boardWidth * 0.5f;
         float originZ = -boardHeight * 0.5f;
 
-        // 加上 0.5f，让格子对齐中心而非交点
-        // c = file, r = rank
         int c = Mathf.Clamp(Mathf.FloorToInt((local.x - originX) / cellSize), 0, cols - 1);
         int r = Mathf.Clamp(Mathf.FloorToInt((local.z - originZ) / cellSize), 0, rows - 1);
 
-        // c += 1;
-        // r += 1;
         if (chessPiece != null)
         {
             if (currSquare == new Square(c + 1, r + 1))
             {
-                // Same square as before
                 c = currSquare.File - 1;
                 r = currSquare.Rank - 1;
                 Debug.Log($"Piece already on square. file: {c + 1}, rank: {r + 1}");
-
             }
             else
             {
@@ -156,7 +169,6 @@ public class SnapToBoardOnRelease : MonoBehaviour
                 bool tryLogicalMove = chessPiece.SetSquare(new Square(c + 1, r + 1));
                 if (!tryLogicalMove)
                 {
-                    // Invalid move, do not snap
                     Debug.Log($"Invalid move, not snapping piece. file: {c + 1}, rank: {r + 1}");
                     c = currSquare.File - 1;
                     r = currSquare.Rank - 1;
@@ -186,8 +198,46 @@ public class SnapToBoardOnRelease : MonoBehaviour
             StopAllCoroutines();
             StartCoroutine(SmoothMove(worldTarget));
         }
+
         currSquare = new Square(c + 1, r + 1);
-        
+    }
+
+    public void MoveToSquareInstant(Square targetSquare)
+    {
+        if (board == null)
+        {
+            Debug.LogError("Board reference missing on SnapToBoardOnRelease.");
+            return;
+        }
+
+        Vector3 up = board.up;
+
+        float originX = -boardWidth * 0.5f;
+        float originZ = -boardHeight * 0.5f;
+
+        int c = Mathf.Clamp(targetSquare.File - 1, 0, cols - 1);
+        int r = Mathf.Clamp(targetSquare.Rank - 1, 0, rows - 1);
+
+        float cx = originX + (c + 0.5f) * cellSize;
+        float cz = originZ + (r + 0.5f) * cellSize;
+
+        Vector3 worldTarget = board.TransformPoint(new Vector3(cx, 0f, cz)) + up * heightOffset;
+
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        if (!smoothSnap)
+        {
+            transform.position = worldTarget;
+            transform.rotation = Quaternion.LookRotation(board.forward, board.up);
+        }
+        else
+        {
+            StopAllCoroutines();
+            StartCoroutine(SmoothMove(worldTarget));
+        }
+
+        currSquare = targetSquare;
     }
 
     IEnumerator SmoothMove(Vector3 target)

@@ -4,8 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
-using UnityEngine.Android; // for permission checks
+using UnityEngine.Android;
 using Meta.XR.MRUtilityKit;
+using System; // for Action
 
 public class ChessBoard : MonoBehaviour
 {
@@ -27,6 +28,9 @@ public class ChessBoard : MonoBehaviour
 
     bool update_chessboard_pos = true;
 
+    // Raised once when board placement is finished
+    public static event Action BoardPlaced;
+
     void set_handle_active(bool active)
     {
         handleA.SetActive(active);
@@ -41,7 +45,6 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         anchorA = handleA.GetComponent<OVRSpatialAnchor>();
@@ -56,10 +59,8 @@ public class ChessBoard : MonoBehaviour
         set_handle_active(true);
         set_pieces_grabbable(false);
         PlaceChessBoard();
-
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (handleA != null && handleB != null && update_chessboard_pos)
@@ -77,8 +78,6 @@ public class ChessBoard : MonoBehaviour
             {
                 if (do_snap_down)
                 {
-                    // snap released to floor, (if other is also not currently grabbed snap it to the other's new position)
-
                     if (was_grabbedA && grabbableA.State != InteractableState.Select)
                     {
                         handleA.transform.position = snap_down(handleA.transform.position);
@@ -93,7 +92,6 @@ public class ChessBoard : MonoBehaviour
                     {
                         Vector3 new_pos = handleA.transform.position;
                         new_pos.y = handleB.transform.position.y;
-
                         handleA.transform.position = new_pos;
                     }
 
@@ -101,7 +99,6 @@ public class ChessBoard : MonoBehaviour
                     {
                         Vector3 new_pos = handleB.transform.position;
                         new_pos.y = handleA.transform.position.y;
-
                         handleB.transform.position = new_pos;
                     }
                 }
@@ -145,17 +142,11 @@ public class ChessBoard : MonoBehaviour
         Vector3 a = handleA.transform.position;
         Vector3 b = handleB.transform.position;
 
-        // Midpoint between anchors
         Vector3 center = (a + b) / 2f;
-
-        // Direction from A to B
         Vector3 direction = (b - a).normalized;
-
-        // Rotation aligning X-axis of the board with the anchor line
         Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up);
 
         transform.SetPositionAndRotation(center, rotation);
-
         transform.localScale = original_scale / original_distance * (handleA.transform.position - handleB.transform.position).magnitude;
     }
 
@@ -165,5 +156,8 @@ public class ChessBoard : MonoBehaviour
         anchorB.gameObject.SetActive(false);
         update_chessboard_pos = false;
         set_pieces_grabbable(true);
+
+        Debug.Log("[ChessBoard] Board placement finished.");
+        BoardPlaced?.Invoke();
     }
 }

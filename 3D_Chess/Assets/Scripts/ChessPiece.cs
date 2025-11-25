@@ -35,10 +35,11 @@ public class ChessPiece : MonoBehaviour
             {
                 logicalSquare = square;
                 Debug.Log($"Move executed from {old} to {square}");
+
+                GameManager.Instance?.OnPieceMoved(this, old, square);  
+
                 return true;
             }
-            
-
             // // TODO: Check for Checkmate
             // if (!game.BoardTimeline.TryGetCurrent(out Board board))
             // {
@@ -49,5 +50,7 @@ public class ChessPiece : MonoBehaviour
         return false;      
 
     }
+
+    
 }
 
